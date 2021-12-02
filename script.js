@@ -24,7 +24,7 @@ const createAst = (string) => {
     if (isPhase) {
       return {
         ...result,
-        [trimmed]: {},
+        [trimmed]: {}
       };
     }
 
@@ -38,8 +38,8 @@ const createAst = (string) => {
       ...result,
       [lastPhase]: {
         ...result[lastPhase],
-        [transition]: target,
-      },
+        [transition]: target
+      }
     };
   }, {});
 
@@ -47,12 +47,12 @@ const createAst = (string) => {
 };
 
 const START = `/**
-* Internal Phasi Logic
-*/
+ * Internal Phasi Logic
+ */
 
-const createPhase = (
-   createActions: (innerSetKey: (newKey: Exclude) => void
-) => void): T => {
+const createPhase = <T extends object>(
+   createActions: (innerSetKey: (newKey) => void
+) => void): T  => {
    let key
    const setKey = (newKey) => { key = newKey }
    const map = createActions(setKey)
@@ -68,31 +68,25 @@ const createPhase = (
    const phase = {
        ...toggles,
        actions: map[key || keys[0]],
-   } as T
+   }
 
-   return phase
+   return phase as T
 }
 
 /**
-* Custom Schema
-*/
+ * Schema
+ */
+`;
 
-type Phase = {
-   `;
-
-const INBETWEEN = `    };
-}
+const INBETWEEN = `
    
 /**
- * Custom Actions
+ * Actions
  */
 
-const createActions = (setKey: (newKey: Exclude) => void) => ({
-  `;
+const createActions = (setKey: (newKey: Exclude<keyof Phase, 'actions'>) => void) => (`;
 
-const END = `,
-   }
-})
+const END = `)
 
 const phase = createPhase(createActions)
 
@@ -107,20 +101,20 @@ const parse = (ast) => {
     const toggles = phases.reduce((innerResult, innerKey) => {
       return {
         ...innerResult,
-        [innerKey]: innerKey === key,
+        [innerKey]: innerKey === key
       };
     }, {});
 
     const actions = actionKeys.reduce((result, key) => {
       return {
         ...result,
-        [key]: "__REPLACE__",
+        [key]: "__REPLACE__"
       };
     }, {});
 
     return {
       ...toggles,
-      actions,
+      actions
     };
   }, {});
 
@@ -131,7 +125,7 @@ const parse = (ast) => {
     .replace(/,?\n\s\s{/gim, "\n | {")
     .replace(/^\s/gim, "   ")
     .replace(/]/, "")
-    .replace(/\,/gim, ";");
+    .replace(/\,/gim, ";")
 
   const innerActions = phases.reduce((result, key) => {
     const obj = ast[key];
@@ -140,27 +134,26 @@ const parse = (ast) => {
     return {
       ...result,
       [key]: keys.reduce((innerResult, innerKey) => {
-        const isTransition = obj[innerKey];
-
+        const transition = obj[innerKey];
         return {
           ...innerResult,
-          [innerKey]: isTransition
-            ? `____${innerKey}____`
-            : `____>${innerKey}____`,
+          [innerKey]: transition
+            ? `____>${transition}____`
+            : `____${innerKey}____`
         };
-      }, {}),
+      }, {})
     };
   }, {});
 
   const after = JSON.stringify(innerActions, null, 2)
-    .replace(/"/gim, "")
+    .replace(/"/gmi, '')
     .replace(
       /____\w+____/gim,
-      (value) => `() => console.log('${value.replace(/____/gim, "")}')'`
+      (value) => `() => console.log('${value.replace(/____/gim, "")}')`
     )
     .replace(
       /____>\w+____/gim,
-      (value) => `() => setKey('${value.replace(/____>?/gim, "")}')'`
+      (value) => `() => setKey('${value.replace(/____>?/gim, "")}')`
     );
 
   return START + before + INBETWEEN + after + END;
@@ -169,7 +162,7 @@ const parse = (ast) => {
 const handleChange = (event) => {
   const ast = createAst(event.target.value);
   const result = parse(ast);
-  output.innerHTML = result;
+  output.innerText = result;
 };
 
 input.addEventListener("keydown", handleTab);
