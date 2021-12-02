@@ -46,7 +46,7 @@ const createAst = (string) => {
   return result;
 };
 
-const START = `/**
+const START = `/*
  * Internal Phasi Logic
  */
 
@@ -73,14 +73,14 @@ const createPhase = <T extends object>(
    return phase as T
 }
 
-/**
+/*
  * Schema
  */
+
 `;
 
 const INBETWEEN = `
-   
-/**
+/*
  * Actions
  */
 
