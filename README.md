@@ -23,7 +23,7 @@ butterfly
 Output: 
 
 ```ts
-/**
+/*
  * Internal Phasi Logic
  */
 
@@ -50,9 +50,10 @@ const createPhase = (
    return phase as T
 }
 
-/**
+/*
  * Schema
  */
+
 type Phase = 
    | {
       egg: true;
@@ -83,8 +84,7 @@ type Phase =
       }
     }
 
-   
-/**
+/*
  * Actions
  */
 
