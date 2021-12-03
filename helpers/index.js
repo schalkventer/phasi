@@ -1,0 +1,5 @@
+export { html } from './html.js'
+export { createAst } from './createAst.js'
+export { parseTypeScript } from './parseTypeScript.js'
+export { handleTab } from './handleTab.js'
+export { handleChange } from './handleChange.js'
