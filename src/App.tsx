@@ -1,8 +1,6 @@
 import React from "react";
-import { createGlobalStyle } from 'styled-components'
-
+import { createGlobalStyle } from "styled-components";
 import { Tool } from "./Tool";
-import { Info } from "./Info";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 
 const Global = createGlobalStyle`

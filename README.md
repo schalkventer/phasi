@@ -1,6 +1,13 @@
+<!-- omit in toc -->
 # 🐛 Phasi
 
-**Converts a custom string notation into a plug-and-play TypeScript finite state machine.**
+**A custom text notation used to describe and prototype nested state machines**
+
+- [Basic Statemachine](#basic-statemachine)
+
+# Basic Statemachine
+
+
 
 
 Input:
