@@ -69,8 +69,8 @@ export const Machine = (props: types.MachineProps) => {
     const eventsArray = events ? createEventsArray(events, selectedStatus) : null
 
     return (
-      <ItemWrap>
-        <Item key={singlePhaseName} name={singlePhaseName} status={selectedStatus} note={note || null}>
+      <ItemWrap key={singlePhaseName}>
+        <Item name={singlePhaseName} status={selectedStatus} note={note || null}>
           <>
             {nestedMachines.map((name) => (
               <Nested status={selectedStatus}>

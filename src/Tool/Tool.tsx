@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent, useEffect, useCallback } from "react";
+import { encodeBase64, compress, decompress, decodeBase64 } from "lzutf8";
 import styled from "styled-components";
-import { useLocalStorage } from "react-use";
+import { useHash } from "react-use";
 
 import { createAst } from "./Tool.helpers";
 import { Machine } from "./Tool.Machine";
@@ -26,8 +27,7 @@ const FloatingLink = styled.a`
   &:hover {
     background: #ad1927;
   }
-`
-
+`;
 
 const Wrapper = styled.div`
   display: flex;
@@ -159,7 +159,14 @@ const flattenActiveMachines = (
 export const Tool = () => {
   const [ref, setRef] = useState<null | any>(null);
   const [ast, setAst] = useState<types.Ast>({});
-  const [value, setValue] = useLocalStorage("1639819237", VALUE_FALLBACK);
+  const [hash, setHash] = useHash();
+
+  console.log(hash)
+
+  const value = hash.trim() === '' ? VALUE_FALLBACK : window.decodeURI(hash.slice(1))
+  const setValue = (newValue: string) => {
+    setHash(window.encodeURI(newValue))
+  }
 
   const [activeMachines, setActiveMachines] = useState<
     Record<string, string[]>
@@ -193,7 +200,8 @@ export const Tool = () => {
       setValue(event.target.value);
       setAst(createAst(event.target.value));
     },
-    [setValue]
+    // eslint-disable-next-line
+    []
   );
 
   useEffect(() => {
@@ -221,53 +229,56 @@ export const Tool = () => {
 
   return (
     <>
-    <Wrapper>
-      <InputWrap closed={hidden.notation}>
-        <Title
-          closed={hidden.notation}
-          onClick={() => setHidden({ ...hidden, notation: !hidden.notation })}
-        >
-          Notation
-        </Title>
-        <Input
-          closed={hidden.notation}
-          defaultValue={value}
-          ref={handleInputRef}
-          onChange={handleChange}
-        />
-      </InputWrap>
-      {Object.keys(ast).map((machineName, index) => {
-        if (index !== 0 && !flatActiveMachines.includes(machineName))
-          return null;
+      <Wrapper>
+        <InputWrap closed={hidden.notation}>
+          <Title
+            closed={hidden.notation}
+            onClick={() => setHidden({ ...hidden, notation: !hidden.notation })}
+          >
+            Notation
+          </Title>
+          <Input
+            closed={hidden.notation}
+            defaultValue={value}
+            ref={handleInputRef}
+            onChange={handleChange}
+          />
+        </InputWrap>
+        {Object.keys(ast).map((machineName, index) => {
+          if (index !== 0 && !flatActiveMachines.includes(machineName))
+            return null;
 
-        return (
-          <ColumnWrap>
-            <Column closed={hidden[machineName]}>
-              <Title
-                closed={hidden[machineName]}
-                onClick={() =>
-                  setHidden({
-                    ...hidden,
-                    [machineName]: !hidden[machineName],
-                  })
-                }
-              >
-                {machineName}
-              </Title>
-              <Content closed={hidden[machineName]}>
-                <Machine
-                  key={machineName}
-                  machineObj={ast[machineName]}
-                  onNested={(array) => handleNested(machineName, array)}
-                />
-              </Content>
-            </Column>
-          </ColumnWrap>
-        );
-      })}
-    </Wrapper>
+          return (
+            <ColumnWrap key={machineName}>
+              <Column closed={hidden[machineName]}>
+                <Title
+                  closed={hidden[machineName]}
+                  onClick={() =>
+                    setHidden({
+                      ...hidden,
+                      [machineName]: !hidden[machineName],
+                    })
+                  }
+                >
+                  {machineName}
+                </Title>
+                <Content closed={hidden[machineName]}>
+                  <Machine
+                    key={machineName}
+                    machineObj={ast[machineName]}
+                    onNested={(array) => handleNested(machineName, array)}
+                  />
+                </Content>
+              </Column>
+            </ColumnWrap>
+          );
+        })}
+      </Wrapper>
 
-      <FloatingLink href="https://github.com/schalkventer/phasi#readme" target="_blank">
+      <FloatingLink
+        href="https://github.com/schalkventer/phasi#readme"
+        target="_blank"
+      >
         What is Phasi?
       </FloatingLink>
     </>

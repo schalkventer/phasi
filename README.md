@@ -3,131 +3,39 @@
 
 **A custom text notation used to describe and prototype nested state machines**
 
-- [Basic Statemachine](#basic-statemachine)
+- [Basic Example](#basic-example)
 
-# Basic Statemachine
+# Basic Example
 
-
-
-
-Input:
+We can create a basic statemachine to describes the phases that a butterfly enters during its life as follows. 
 
 ```
+---
+Organism
+---
+
 egg
   grow
-  hatch > caterpillar
+  hatch >> caterpillar
 
 caterpillar
   eat
   crawl
-  cocoon > butterfly
+  cocoon >> butterfly
 
 butterfly
   fly
-  mate > egg
+  mate >> egg
 ```
 
-Output: 
+The basic syntax can be described as follows:
 
-```ts
-/*
- * Internal Phasi Logic
- */
+- The value between the `---` lines provides a name for the machine
+- All lines with no whitespace at the front describe phases (in this case `egg`, `caterpillar` and `butterfly`)
+- Any indented line (with whitespace at the front) describe an action nested inside a phase.
+- Any actions that have `>>` at the end indicates that the action causes a transition to a new phase (the name of the target phase after the `>>`)
+- Actions that do not have `>>` do not trigger transitions, but usually causes some side-effect outside the statemachine itself.
 
-const createPhase = (
-   createActions: (innerSetKey: (newKey) => void
-) => void): T  => {
-   let key
-   const setKey = (newKey) => { key = newKey }
-   const map = createActions(setKey)
-   if (key && !map[key]) throw new Error('The passed key does not match any predefined phase')
+You can view the [Basic Example Demo](https://phasi.io/#---%0Aorganism%0A---%0A%0Aegg%0A%20%20grow%0A%20%20hatch%20%3E%3E%20caterpillar%20//%20first%20event%0A%0Acaterpillar%20//%20has%2012%20eyes%0A%20%20eat%20//%20goes%20munch%20munch%0A%20%20crawl%20//%20goes%20squish%20squish%0A%20%20cocoon%20%3E%3E%20butterfly%0A%0Abutterfly%0A%20%20fly%20//%20butterfly%20goes%20brrrrr%0A%20%20mate%20%3E%3E%20egg)
+ to see this in action. Remember to open the panes on the right-hand side (since they are closed by default) and click on an action in the current phase to transition.
 
-   const keys = Object.keys(map as any)
-
-   const toggles = keys.reduce((result, innerKey) => ({
-       ...result,
-       [innerKey]: innerKey === key || keys[0],
-   }), {})
-
-   const phase = {
-       ...toggles,
-       actions: map[key || keys[0]],
-   }
-
-   return phase as T
-}
-
-/*
- * Schema
- */
-
-type Phase = 
-   | {
-      egg: true;
-      caterpillar: false;
-      butterfly: false;
-      actions: {
-        grow: Function;
-        hatch: Function
-      }
-    }
-   | {
-      egg: false;
-      caterpillar: true;
-      butterfly: false;
-      actions: {
-        eat: Function;
-        crawl: Function;
-        cocoon: Function
-      }
-    }
-   | {
-      egg: false;
-      caterpillar: false;
-      butterfly: true;
-      actions: {
-        fly: Function;
-        mate: Function
-      }
-    }
-
-/*
- * Actions
- */
-
-const createActions = (setKey: (newKey: Exclude) => void) => ({
-  egg: {
-    grow: () => console.log('grow'),
-    hatch: () => setKey('caterpillar')
-  },
-  caterpillar: {
-    eat: () => console.log('eat'),
-    crawl: () => console.log('crawl'),
-    cocoon: () => setKey('butterfly')
-  },
-  butterfly: {
-    fly: () => console.log('fly'),
-    mate: () => setKey('egg')
-  }
-})
-
-const phase = createPhase(createActions)
-
-const evolve = () => {
-  if (phase.egg) return phase.actions.hatch()
-  if (phase.caterpillar) return phase.actions.cocoon()
-  if (phase.butterfly) return phase.actions.mate()
-
-  throw new Error('Unable to evolve')
-}
-
-evolve();
-console.log(phase.caterpillar) // true
-
-evolve();
-console.log(phase.butterfly) // true
-console.log(phase.egg) // false
-
-evolve();
-console.log(phase.egg) // false
-```
