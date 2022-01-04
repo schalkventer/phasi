@@ -1,6 +1,8 @@
 <!-- omit in toc -->
 # 🐛 Phasi
 
+![](https://img.shields.io/badge/version-0.0.3-blue)
+
 **A custom text notation used to describe and prototype nested state machines**
 
 - [Basic Example](#basic-example)
